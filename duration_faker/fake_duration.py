@@ -47,6 +47,8 @@ with open(sys.argv[1], 'rb') as file_in:
 data = modify_timescale(data)
 data = modify_tkhd(data, 29700000, 29700000)
 data = modify_mvhd(data, 29700000, 29700000)
+#data = modify_tkhd(data, 0x7FFFFFFF, 29700000) 
+#data = modify_mvhd(data, 0x7FFFFFFF, 29700000)
 
 ####          ####
 with open(sys.argv[2], 'wb') as file_out:
