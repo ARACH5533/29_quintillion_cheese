@@ -4,17 +4,13 @@ set -e
 MY_DIR="$(realpath "$(dirname $0)")"
 . "$MY_DIR/config.sh"
 
-check_vars=(IMG_DIR OUT BG_COLOR WIDTH HEIGHT FONTSIZE OFFSET CRF DUR FPS)
+check_vars=(CHEESES OUT BG_COLOR WIDTH HEIGHT FONTSIZE OFFSET CRF DUR FPS)
 for var in "${check_vars[@]}"; do
     if [[ -z "${!var}" ]]; then echo "$var is not set in config.sh"; exit 1; fi
 done
 
 if ! declare -f get_video_title &>/dev/null; then echo "get_video_title() missing"; exit 1; fi
 if ! declare -f get_ranking_title &>/dev/null; then echo "get_ranking_title() missing"; exit 1; fi
-
-FILES=($(ls -v "$MY_DIR/$IMG_DIR"))
-COUNT=${#FILES[@]}
-if [ $COUNT -eq 0 ]; then echo "No image found"; exit 1; fi
 
 FILTER_SCRIPT=$(mktemp)
 trap "rm -f '$FILTER_SCRIPT'" EXIT
@@ -43,7 +39,7 @@ PADS+="[v$IDX]"
 IDX=$((IDX + 1))
 
 ## frame 2+ ##
-for (( i=$COUNT; i>=1; i-- )); do
+for (( i=$CHEESES; i>=1; i-- )); do
     ##: Ranking Title
     INPUT_ARGS+=("-f" "lavfi" "-i" "color=c=${BG_COLOR}:s=${WIDTH}x${HEIGHT}:d=${DUR}")
     rank_text=$(escape_filter_text "$(get_ranking_title $(echo "$i + $OFFSET" | bc))")
@@ -52,8 +48,8 @@ for (( i=$COUNT; i>=1; i-- )); do
     IDX=$((IDX + 1))
 
     ##: Image
-    img=${FILES[$((i - 1))]}
-    INPUT_ARGS+=("-loop" "1" "-t" "${DUR}" "-i" "$MY_DIR/$IMG_DIR/$img")
+    img=$(get_image_path $i)
+    INPUT_ARGS+=("-loop" "1" "-t" "${DUR}" "-i" "$img")
     echo "[$IDX]scale=${WIDTH}:${HEIGHT}:force_original_aspect_ratio=decrease,pad=${WIDTH}:${HEIGHT}:(ow-iw)/2:(oh-ih)/2:black,setsar=1[v$IDX];" >> "$FILTER_SCRIPT"
     PADS+="[v$IDX]"
     IDX=$((IDX + 1))
