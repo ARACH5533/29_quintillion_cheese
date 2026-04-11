@@ -76,7 +76,7 @@ Edit `video_creater/config.sh` to customize:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `IMG_DIR` | `./cheeses` | Directory containing cheese images |
+| `CHEESES` | `100` | The number of cheese images |
 | `OUT` | `top_cheese.mp4` | Output video filename |
 | `BG_COLOR` | `blue` | Background color for title screen |
 | `WIDTH` | `256` | Video width (pixels) |
@@ -96,6 +96,10 @@ get_video_title() {
 
 get_ranking_title() {
     echo "#$1"
+}
+
+get_image_path() {
+    echo "./cheeses/$1.png"
 }
 ```
 ## Credits
